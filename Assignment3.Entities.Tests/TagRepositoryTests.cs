@@ -87,6 +87,37 @@ public class TagRepositoryTests : IDisposable
         localTags.Should().BeEquivalentTo(retrievedTags);
     }
     
+    [Fact]
+    public void Update_UpdatesTagEntity_WhenGivenTagUpdateDTO()
+    {
+        // Arrange
+        var tagRepo = new TagRepository(_context);
+        var (_, t1) = tagRepo.Create(
+            new TagCreateDTO("cool tag"));
+        var (_, t2) = tagRepo.Create(
+            new TagCreateDTO("awesome tag"));
+        var (_, t3) = tagRepo.Create(
+            new TagCreateDTO("bad tag"));
+        
+        // Act
+        var r1 = tagRepo.Update(new TagUpdateDTO(t1, "coolest tag"));
+        var r2 = tagRepo.Update(new TagUpdateDTO(t2, "coolest tag"));
+        var r3 = tagRepo.Update(new TagUpdateDTO(t3, "cool tag"));
+
+        var n1 = tagRepo.Read(t1).Name;
+        var n2 = tagRepo.Read(t2).Name;
+        var n3 = tagRepo.Read(t3).Name;
+        
+        // Assert
+        Assert.Equal(Response.Updated, r1);
+        Assert.Equal(Response.Conflict, r2);
+        Assert.Equal(Response.Updated, r3);
+
+        n1.Should().BeEquivalentTo("coolest tag");
+        n2.Should().BeEquivalentTo("awesome tag");
+        n3.Should().BeEquivalentTo("cool tag");
+    }
+    
     public void Dispose()
     {
         _context.Dispose();

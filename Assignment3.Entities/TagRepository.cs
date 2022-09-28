@@ -38,7 +38,10 @@ public class TagRepository : ITagRepository
                 result = Response.BadRequest;
             }
             // for some reason, it doesnt clear bad changes upon trying to save... 
-            _context.Tags.Remove(tagEntity);
+            //_context.Tags.Remove(tagEntity);
+            
+            // same effect as above, just not dumb
+            _context.ChangeTracker.Clear();
         }
         return (result, tagEntity.Id);
     }
@@ -64,7 +67,33 @@ public class TagRepository : ITagRepository
 
     public Response Update(TagUpdateDTO tag)
     {
-        throw new NotImplementedException();
+        var tagEntity = _context.Tags.FirstOrDefault(t => t.Id == tag.Id);
+        if (tagEntity != null)
+        {
+            // same as for create, database ignores length restriction
+            // so do a manual check
+            if (tag.Name.Length > 50)
+            {
+                return Response.BadRequest;
+            }
+            tagEntity.Name = tag.Name;
+            try {
+                _context.SaveChanges();
+                return Response.Updated;
+            } catch (DbUpdateException e)
+            {
+                _context.ChangeTracker.Clear();
+                Console.WriteLine(e.InnerException.Message.ToString());
+                if (e.InnerException.Message.StartsWith("SQLite Error 19:"))
+                {
+                    return Response.Conflict;
+                } else
+                {
+                    return Response.BadRequest;
+                }
+            }
+        }
+        return Response.NotFound;
     }
 
     public Response Delete(int tagId, bool force = false)
