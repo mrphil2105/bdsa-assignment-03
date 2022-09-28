@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Diagnostics;
 using Assignment3.Core;
 using Microsoft.EntityFrameworkCore;
@@ -44,12 +45,21 @@ public class TagRepository : ITagRepository
 
     public IReadOnlyCollection<TagDTO> ReadAll()
     {
-        throw new NotImplementedException();
+        // maybe there's a better way then .Where(...) to get every item
+        var r = _context.Tags.Where(p => p.Id != 0).Select(p => new TagDTO(p.Id, p.Name)).ToImmutableList();
+        return r;
     }
 
     public TagDTO Read(int tagId)
     {
-        throw new NotImplementedException();
+        //  exception thrown if multiple ids found, but thats not possible with our use
+        // so no need to worry
+        var tagEntity = _context.Tags.SingleOrDefault(t => t.Id == tagId);
+        if (tagEntity != null)
+        {
+            return new TagDTO(tagEntity.Id, tagEntity.Name);
+        }
+        return null;
     }
 
     public Response Update(TagUpdateDTO tag)
