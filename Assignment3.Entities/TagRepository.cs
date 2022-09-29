@@ -22,7 +22,7 @@ public class TagRepository : ITagRepository
         }
         Tag tagEntity = new Tag();
         tagEntity.Name = tag.Name;
-        tagEntity.Tasks = new List<Task>();
+        //tagEntity.Tasks = new List<Task>();
         
         var _ = _context.Tags.Add(tagEntity);
         Response result;
@@ -46,7 +46,7 @@ public class TagRepository : ITagRepository
     public IReadOnlyCollection<TagDTO> ReadAll()
     {
         // maybe there's a better way then .Where(...) to get every item
-        var r = _context.Tags.Where(p => p.Id != 0).Select(p => new TagDTO(p.Id, p.Name)).ToImmutableList();
+        var r = _context.Tags.Include(t => t.Tasks).Where(p => p.Id != 0).Select(p => new TagDTO(p.Id, p.Name)).ToImmutableList();
         return r;
     }
 
@@ -95,12 +95,12 @@ public class TagRepository : ITagRepository
 
     public Response Delete(int tagId, bool force = false)
     {
-        var tagEntity = _context.Tags.FirstOrDefault(t => t.Id == tagId);
+        var tagEntity = _context.Tags.Include(t => t.Tasks).FirstOrDefault(t => t.Id == tagId);
         if (tagEntity != null)
         {
             if (tagEntity.Tasks.Any() && !force)
             {
-                return Response.Conflict;
+                return   Response.Conflict;
             }
 
             _context.Tags.Remove(tagEntity);
