@@ -1,0 +1,19 @@
+// first diagram
+graph TD
+    X(("•")) -->|"clone"| U("Unmodified")
+    U -->|"edit"| M(Modified)
+
+style U fill:#00909a
+style M fill:#cd9f00
+style X fill:#333333
+
+// second diagram
+graph TD
+    X(("•")) --> |"new file"| T("Untracked")
+    T --> |"add"| S("Staged")
+    S --> |"commit"| U("Unmodified")
+
+style T fill:#efefe7
+style S fill:#f44d27
+style U fill:#00909a
+style X fill:#333333
