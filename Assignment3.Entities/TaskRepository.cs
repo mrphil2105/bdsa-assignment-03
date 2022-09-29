@@ -21,20 +21,25 @@ public class TaskRepository : ITaskRepository
         {
             return (Response.BadRequest, 0);
         }
-        // assignment gave choice of implementing either user or tag, and since we implemented tag, we can't follow requirement 7 for task
-        // however, this is how the code would look if we had implemented user instead
-        /*var userEntity = _context.Users.SingleOrDefault(t => t.Id == task.AssignedToId);
-        if (userEntity == null)
-        {
-            return (Response.BadRequest, 0);
-        }*/
-        
+
         Task taskEntity = new Task();
         taskEntity.Title = task.Title;
         taskEntity.Description = task.Description!;
         taskEntity.State = State.New;
         var tagEntities = _context.Tags.Where(tE => task.Tags.Any(tS => tE.Name == tS)).ToList();
         taskEntity.Tags = tagEntities;
+        // assignment gave choice of implementing either user or tag, and since we implemented tag, we can't follow requirement 7 for task
+        // however, this is how the code would look if we had implemented user instead
+        /*
+        if(task.AssignedToId != null) {
+            var userEntity = _context.Users.SingleOrDefault(t => t.Id == task.AssignedToId);
+            if (userEntity == null)
+            {
+                return (Response.BadRequest, 0);
+            }
+            taskEntity.AssignedTo = userEntity;
+        }*/
+        
         // requirement 4 mentions Created/StateUpdated - but these are completely new fields
         // that have not been mentioned anywhere. under the assumption that they are long properties/fields on taskEntity
         // this is how the code would have looked
@@ -95,8 +100,8 @@ public class TaskRepository : ITaskRepository
         // these fields dont exist per definition of Task in assignment, so we initialize them to current time
         var dummy = DateTime.UtcNow;
         //"John Doe" would instead be p.AssignedTo.Name
-        var r = _context.Tasks.Include(p => p.Tags).Where(t => t.Id == taskId).Select(t => new TaskDetailsDTO(t.Id, t.Title, t.Description, dummy, "John Doe", t.Tags.Select(t => t.Name).ToImmutableList(), t.State, dummy));
-        throw new NotImplementedException();
+        var r = _context.Tasks.Include(p => p.Tags).Where(t => t.Id == taskId).Select(t => new TaskDetailsDTO(t.Id, t.Title, t.Description, dummy, "John Doe", t.Tags.Select(t => t.Name).ToImmutableList(), t.State, dummy)).FirstOrDefault();
+        return r;
     }
 
     public Response Update(TaskUpdateDTO task)
@@ -129,7 +134,6 @@ public class TaskRepository : ITaskRepository
             // this is how the code would have looked
             /*taskEntity.StateUpdated = DateTime.UtcNow;*/
 
-            var _ = _context.Tasks.Add(taskEntity);
             try {
                 _context.SaveChanges();
                 return Response.Updated;

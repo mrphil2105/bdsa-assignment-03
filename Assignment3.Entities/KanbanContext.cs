@@ -22,18 +22,14 @@ public class KanbanContext : DbContext
             .Property(e => e.Title)
             .HasMaxLength(100)
             .IsRequired();
-        
-        /*modelBuilder
-            .Entity<Task>()
-            .Property(e => e.Description)*/
-        
+
         modelBuilder
             .Entity<Task>()
             .Property(e => e.State)
             .HasConversion(
                 v => v.ToString(),
                 v => (State)Enum.Parse(typeof(State), v));
-
+        
 
         modelBuilder
             .Entity<User>()
