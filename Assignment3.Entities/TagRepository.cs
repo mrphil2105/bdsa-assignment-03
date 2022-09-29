@@ -22,6 +22,7 @@ public class TagRepository : ITagRepository
         }
         Tag tagEntity = new Tag();
         tagEntity.Name = tag.Name;
+        tagEntity.Tasks = new List<Task>();
         
         var _ = _context.Tags.Add(tagEntity);
         Response result;
@@ -29,18 +30,14 @@ public class TagRepository : ITagRepository
             _context.SaveChanges();
             result = Response.Created;
         } catch (DbUpdateException e) {
-            Console.WriteLine(e.InnerException.Message.ToString());
-            if (e.InnerException.Message.StartsWith("SQLite Error 19:"))
+            Console.WriteLine(e.InnerException?.Message);
+            if (e.InnerException != null && e.InnerException.Message.StartsWith("SQLite Error 19:"))
             {
                 result = Response.Conflict;
             } else
             {
                 result = Response.BadRequest;
             }
-            // for some reason, it doesnt clear bad changes upon trying to save... 
-            //_context.Tags.Remove(tagEntity);
-            
-            // same effect as above, just not dumb
             _context.ChangeTracker.Clear();
         }
         return (result, tagEntity.Id);
@@ -83,8 +80,8 @@ public class TagRepository : ITagRepository
             } catch (DbUpdateException e)
             {
                 _context.ChangeTracker.Clear();
-                Console.WriteLine(e.InnerException.Message.ToString());
-                if (e.InnerException.Message.StartsWith("SQLite Error 19:"))
+                Console.WriteLine(e.InnerException?.Message);
+                if (e.InnerException != null && e.InnerException.Message.StartsWith("SQLite Error 19:"))
                 {
                     return Response.Conflict;
                 } else
@@ -98,6 +95,27 @@ public class TagRepository : ITagRepository
 
     public Response Delete(int tagId, bool force = false)
     {
-        throw new NotImplementedException();
+        var tagEntity = _context.Tags.FirstOrDefault(t => t.Id == tagId);
+        if (tagEntity != null)
+        {
+            if (tagEntity.Tasks.Any() && !force)
+            {
+                return Response.Conflict;
+            }
+
+            _context.Tags.Remove(tagEntity);
+            try
+            {
+                _context.SaveChanges();
+                return Response.Deleted;
+            }
+            catch (DbUpdateException e)
+            {
+                _context.ChangeTracker.Clear();
+                Console.WriteLine(e.InnerException?.Message);
+                return Response.BadRequest;
+            }
+        }
+        return Response.NotFound;
     }
 }

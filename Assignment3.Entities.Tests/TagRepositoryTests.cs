@@ -118,6 +118,24 @@ public class TagRepositoryTests : IDisposable
         n3.Should().BeEquivalentTo("cool tag");
     }
     
+    [Fact]
+    public void Delete_ReturnsDeleted_WhenGivenId()
+    {
+        // Arrange
+        var tagRepo = new TagRepository(_context);
+        var tagName1 = "cool tag";
+        var (_, id) = tagRepo.Create(
+            new TagCreateDTO(tagName1));
+
+        // Act
+        var r1 = tagRepo.Delete(id, false);
+        var r2 = tagRepo.Delete(id);
+
+        // Assert
+        Assert.Equal(Response.Deleted, r1);
+        Assert.Equal(Response.NotFound, r2);
+    }
+    
     public void Dispose()
     {
         _context.Dispose();
