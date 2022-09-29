@@ -24,7 +24,6 @@ public class TagRepository : ITagRepository
 
         var tagEntity = new Tag();
         tagEntity.Name = tag.Name;
-        //tagEntity.Tasks = new List<Task>();
 
         var _ = _context.Tags.Add(tagEntity);
         Response result;

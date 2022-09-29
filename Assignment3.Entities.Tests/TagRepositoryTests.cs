@@ -14,8 +14,6 @@ public class TagRepositoryTests : IDisposable
     {
         _testOutputHelper = testOutputHelper;
         var optionsBuilder = new DbContextOptionsBuilder<KanbanContext>();
-        //optionsBuilder.UseInMemoryDatabase("KanbanDb");
-        //optionsBuilder.UseSqlite("DataSource=:memory:");
 
         var connection = new SqliteConnection("Data Source=:memory:");
         connection.Open();

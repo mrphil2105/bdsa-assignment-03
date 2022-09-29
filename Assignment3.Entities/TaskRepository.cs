@@ -98,7 +98,6 @@ public class TaskRepository : ITaskRepository
                 .ToImmutableList(), p.State))
             .ToImmutableList();
 
-        //var r = _context.Tasks.Include(t => t.Tags).Where(p => p.Tags.Select(x => x.Name).Contains(tag)).Select(p => new TaskDTO(p.Id, p.Title, "John Doe", p.Tags.Select(t => t.Name).ToImmutableList(), p.State)).ToImmutableList();
         return r;
     }
 
@@ -111,7 +110,6 @@ public class TaskRepository : ITaskRepository
                 .ToImmutableList(), p.State))
             .ToImmutableList();
 
-        //var r = _context.Tasks.Include(t => t.Tags).Where(p => p.AssignedTo == _context.Users.FirstOrDefault(u => u.Id == userId)).Select(p => new TaskDTO(p.Id, p.Title, "John Doe", p.Tags.Select(t => t.Name).ToImmutableList(), p.State)).ToImmutableList();
         return r;
     }
 

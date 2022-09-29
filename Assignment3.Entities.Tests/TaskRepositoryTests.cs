@@ -14,8 +14,6 @@ public class TaskRepositoryTests
     {
         _testOutputHelper = testOutputHelper;
         var optionsBuilder = new DbContextOptionsBuilder<KanbanContext>();
-        //optionsBuilder.UseInMemoryDatabase("KanbanDb");
-        //optionsBuilder.UseSqlite("DataSource=:memory:");
 
         var connection = new SqliteConnection("Data Source=:memory:");
         connection.Open();
@@ -55,7 +53,6 @@ public class TaskRepositoryTests
     [Fact]
     public void ReadAll_ReturnsTaskDTO()
     {
-        // Arrange
         var tagRepo = new TagRepository(_context);
         var tags = new[] { "ASAP", "Whenever", "Important", "Inspiration" };
 
@@ -79,7 +76,6 @@ public class TaskRepositoryTests
     [Fact]
     public void Update_UpdatesStateOfTask()
     {
-        // Arrange
         var tagRepo = new TagRepository(_context);
         var tags = new[] { "ASAP", "Whenever", "Important", "Inspiration" };
 
@@ -105,7 +101,6 @@ public class TaskRepositoryTests
     [Fact]
     public void Delete_RemovesTaskEntity()
     {
-        // Arrange
         var tagRepo = new TagRepository(_context);
         var tags = new[] { "ASAP", "Whenever", "Important", "Inspiration" };
 
@@ -124,7 +119,6 @@ public class TaskRepositoryTests
     [Fact]
     public void ReadAllByTag_ReturnsOne()
     {
-        // Arrange
         var tagRepo = new TagRepository(_context);
         var tags = new[] { "ASAP", "Whenever", "Important", "Inspiration" };
 
@@ -149,7 +143,6 @@ public class TaskRepositoryTests
     [Fact]
     public void Read_ReturnsSpecifiedID()
     {
-        // Arrange
         var tagRepo = new TagRepository(_context);
         var tags = new[] { "ASAP", "Whenever", "Important", "Inspiration" };
 
@@ -178,7 +171,6 @@ public class TaskRepositoryTests
     [Fact]
     public void ReadAllRemoved_ReturnsTaskDTO()
     {
-        // Arrange
         var tagRepo = new TagRepository(_context);
         var tags = new[] { "ASAP", "Whenever", "Important", "Inspiration" };
 
